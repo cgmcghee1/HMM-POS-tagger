@@ -5,7 +5,7 @@ import numpy as np
 class Model:
 
     def __init__(self, corpus):
-
+        #takes input from nltk.corpus, for example treebank or brown
 
         self.words_tags = []
 
