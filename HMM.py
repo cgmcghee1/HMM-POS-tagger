@@ -1,7 +1,7 @@
 import nltk
 from nltk.util import bigrams
 import numpy as np
-import pudb; pu.db
+
 class Model:
 
     def __init__(self, corpus):
@@ -30,7 +30,7 @@ class Model:
 
         for tag_1 in self.tagdict:
             b = [[t_1] for [t_1,t] in self.tagbigrams if t_1 == tag_1]
-            print(str(self.tagdict[tag_1]/len(self.uniquetags)*100) + '%')
+            print(str(round(self.tagdict[tag_1]/len(self.uniquetags)*100, 1)) + '%')
             for tag in self.tagdict:
                 a = [[t_1, t] for [t_1,t] in self.tagbigrams if t_1 == tag_1\
                          and t == tag]
