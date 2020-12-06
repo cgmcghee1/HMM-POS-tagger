@@ -1,6 +1,7 @@
 import nltk
 from nltk.util import bigrams
 import numpy as np
+from nltk.tokenize import word_tokenize
 
 class Model:
 
@@ -35,37 +36,46 @@ class Model:
                 a = [[t_1, t] for [t_1,t] in self.tagbigrams if t_1 == tag_1\
                          and t == tag]
 
-                self.transition_probs[self.tagdict[tag_1]][self.tagdict[tag]]\
+                self.transition_probs[self.tagdict[tag]][self.tagdict[tag_1]]\
                     = len(a)/len(b)
 
         return(self)
 
 
     def emission_probs(self, w, t):
-        count_w_t = len([[word, tag] for [word, tag] in self.words_tags if tag == t and word == w])
+        count_w_t = len([[word, tag] for [word, tag] in self.words_tags if tag == t\
+                         and word == w]) + 1
         count_t = len([[tag] for [word, tag] in self.words_tags if tag == t])
         emission_prob = count_w_t/count_t
         return(emission_prob)
 
 
     def tagger(self, sentence):
-        splitsent = sentence.split()
+        splitsent = word_tokenize(sentence)
         self.vitmatrix = np.zeros(shape = (len(self.tagdict), len(splitsent)), dtype = float)
 
         backpointer = []
 
         for tag in self.tagdict:
-             tag_1 = self.tagdict["START"]
-             self.vitmatrix[self.tagdict[tag]][0] = self.transition_probs[tag_1]\
-                 [self.tagdict[tag]] * self.emission_probs(splitsent[0], tag)
+             tag_1 = "START"
+             self.vitmatrix[self.tagdict[tag]][0] = self.transition_probs\
+                 [self.tagdict[tag]][self.tagdict[tag_1]] * self.emission_probs\
+                 (splitsent[0],tag)
 
         index = np.argmax(self.vitmatrix[:,0])
         backpointer.append(self.numdict[index])
 
         for i in range(1, len(splitsent)):
             for tag in self.tagdict:
-                self.vitmatrix[self.tagdict[tag]][i] = self.emission_probs (splitsent[i], tag)\
-                       * self.transition_probs[self.tagdict[backpointer[i-1]]][self.tagdict[tag]]
+                maxarray = []
+                for tag_1 in self.tagdict:
+                    maxarray.append(self.vitmatrix[self.tagdict[tag_1]][i-1]*self.\
+                                    transition_probs[self.tagdict[tag]][self.tagdict[tag_1]])
+
+                vitmax = max(maxarray)
+                print(vitmax)
+                self.vitmatrix[self.tagdict[tag]][i] = vitmax * self.emission_probs\
+                    (splitsent[i],tag)
 
             index = np.argmax(self.vitmatrix[:,i])
             backpointer.append(self.numdict[index])
