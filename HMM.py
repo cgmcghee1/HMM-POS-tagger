@@ -73,7 +73,6 @@ class Model:
                                     transition_probs[self.tagdict[tag]][self.tagdict[tag_1]])
 
                 vitmax = max(maxarray)
-                print(vitmax)
                 self.vitmatrix[self.tagdict[tag]][i] = vitmax * self.emission_probs\
                     (splitsent[i],tag)
 
