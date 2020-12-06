@@ -10,7 +10,7 @@ class Model:
 
         self.words_tags = []
 
-        for sent in corpus.tagged_sents():
+        for sent in corpus.tagged_sents(tagset = 'universal'):
             self.words_tags.append(("START", "START"))
             self.words_tags.extend([tup for tup in sent])
             self.words_tags.append(("END", "END"))
