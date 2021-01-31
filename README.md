@@ -9,5 +9,6 @@ This is my attempt at a POS tagger using a Hidden Markov Model. Usage would be t
 
 ['VERB', 'PRON', 'VERB', 'DET', 'NOUN', '.']
 
-
+<p>If you are using pip you can install the required packages with the following command:</p>
+<p>>>> pip install -r requirements.txt</p>
 
