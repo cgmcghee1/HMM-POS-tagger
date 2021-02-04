@@ -3,8 +3,8 @@
 
 This is my attempt at a POS tagger using a Hidden Markov Model. Usage would be the following:
 
-<p> >>> from nltk.corpus import brown </p>
-<p> >>> a = HMM.Model(brown).train() </p>
+<p> >>> from nltk.corpus import treebank </p>
+<p> >>> a = HMM.Model(treebank).train() </p>
 <p> >>> a.tagger('Where are the boys?')</p>
 
 ['ADV', 'VERB', 'DET, 'NOUN', '.']
