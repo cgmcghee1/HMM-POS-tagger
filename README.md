@@ -12,3 +12,4 @@ This is my attempt at a POS tagger using a Hidden Markov Model. Usage would be t
 <p>If you are using pip you can install the required packages with the following command:</p>
 <p>$ pip install -r requirements.txt</p>
 
+<p><b>To note</b>: this implementation only uses universal tags and is quite slow, therefore I would not recommend anyone use this to actually tag things </p>
