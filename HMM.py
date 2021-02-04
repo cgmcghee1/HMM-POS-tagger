@@ -39,7 +39,7 @@ class Model:
 
     def train(self):
         """
-        Function which creates a numpy matrix of the transition probabilities between states (tags)/
+        Function which creates a numpy matrix of the transition probabilities between states (tags)
 
         :classattribute tagdict: a dictionary which maps an index to each unique tag
         :classattribute numdict: a dictionary which maps a tag to it's index from tagdict
@@ -54,7 +54,7 @@ class Model:
         self.numdict = {num:tag for (tag, num) in self.tagdict.items()}
 
         self.transition_probs = np.zeros(shape = (len(self.tagdict), len(self.tagdict))\
-                                    , dtype = float)
+                                    , dtype = np.float32)
 
         for tag_1 in self.tagdict:
             b = [[t_1] for [t_1,t] in self.tagbigrams if t_1 == tag_1]
@@ -92,42 +92,42 @@ class Model:
         sequence.
 
         :param sentence: input string representing the sentence to be tagged
-        :classattribute vitmatrix: numpy matrix which stores the probability values for the
-        Viterbi algorithm
         :classattribute tagdict: a dictionary which maps an index to each unique tag
         :classattribute transition_probs: numpy matrix which stores the transition
         probabilities between states (tags)
         :classattribute numdict: a dictionary which maps a tag to it's index from tagdict
-        :return backpointer: list of best tag sequence
+        :return bestpath: list of best tag sequence
+
         """
 
         splitsent = word_tokenize(sentence)
-        self.vitmatrix = np.zeros(shape = (len(self.tagdict), len(splitsent)), dtype = float)
-
-        backpointer = []
+        vitmatrix = np.zeros(shape = (len(self.tagdict), len(splitsent)), dtype = np.float32)
+        backpointer = np.zeros(shape = (len(self.tagdict), len(splitsent)), dtype = np.int)
 
         for tag in self.tagdict:
              tag_1 = "START"
-             self.vitmatrix[self.tagdict[tag]][0] = self.transition_probs\
+             vitmatrix[self.tagdict[tag]][0] = self.transition_probs\
                  [self.tagdict[tag]][self.tagdict[tag_1]] * self.emission_probs\
                  (splitsent[0],tag)
-
-        index = np.argmax(self.vitmatrix[:,0])
-        backpointer.append(self.numdict[index])
+             backpointer[self.tagdict[tag]][0] = 0
 
         for i in range(1, len(splitsent)):
             for tag in self.tagdict:
-                maxarray = []
+                max_array = []
                 for tag_1 in self.tagdict:
-                    maxarray.append(self.vitmatrix[self.tagdict[tag_1]][i-1]*self.\
-                                    transition_probs[self.tagdict[tag]][self.tagdict[tag_1]])
+                    max_array.append(vitmatrix[self.tagdict[tag_1]][i-1] * \
+                                     self.transition_probs[self.tagdict[tag]][self.tagdict[tag_1]]
+                                     * self.emission_probs(splitsent[i], tag))
+                vitmatrix[self.tagdict[tag]][i] = np.max(max_array)
+                backpointer[self.tagdict[tag]][i] = np.argmax(max_array)
 
-                vitmax = max(maxarray)
-                self.vitmatrix[self.tagdict[tag]][i] = vitmax * self.emission_probs\
-                    (splitsent[i],tag)
+        bestpathpointer = np.argmax(vitmatrix[:,-1])
+        bestpath = []
+        bestpath.append(self.numdict[bestpathpointer])
 
-            index = np.argmax(self.vitmatrix[:,i])
-            backpointer.append(self.numdict[index])
+        for i in reversed(range(1, len(splitsent))):
+            bestpathpointer = backpointer[bestpathpointer][i]
+            bestpath.append(self.numdict[bestpathpointer])
 
-        return(backpointer)
-
+        bestpath.reverse()
+        return bestpath
